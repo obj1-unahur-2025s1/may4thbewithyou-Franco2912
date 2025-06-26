@@ -1,9 +1,95 @@
-import example.pepita
+import starwars.*
 
-describe "group of tests for pepita" {
+describe "Sucesos emocionales y Maestros Jedi/Sith" {
 
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
+  const anakin = new Maestro(lado="jedi", midiclorianos=20000)
+  const obiwan = new Maestro(lado="jedi", midiclorianos=15000)
+  const amigoFuerte = new Maestro(lado="jedi", midiclorianos=30000)
+
+  test "Conseguir un amigo suma la potencia del amigo como carga emocional" {
+    const carga = amigoFuerte.potencia()
+    assert.equals(50, anakin.esperanza())
+
+    anakin.vivirSuceso(carga)
+    assert.equals(carga + 50, anakin.esperanza())
   }
+
+  test "Participar en una batalla resta esperanza según bajas" {
+    anakin.vivirSuceso(-30)
+    assert.equals(20, anakin.esperanza())
+  }
+
+  test "Ganar una carrera suma 5 de esperanza" {
+    anakin.vivirSuceso(5)
+    assert.equals(55, anakin.esperanza())
+  }
+
+  test "Si siendo Sith vive un suceso de carga >100, vuelve a Jedi y fuerza oscura baja" {
+    anakin.vivirSuceso(-60) // pasa a sith
+    anakin.vivirSuceso(150) // suceso muy positivo
+    assert.equals("jedi", anakin.lado())
+    assert.equals(50, anakin.esperanza())
+    assert.equals(1, fuerzaOscuraGlobal.nivel())
+  } 
+
+  test "Suceso compuesto: suma varias cargas emocionales" {
+    const sucesos = [5, -10, amigoFuerte.potencia()]
+    sucesos.forEach({carga => obiwan.vivirSuceso(carga)})
+    assert.equals(50 + 5 - 10 + amigoFuerte.potencia(), obiwan.esperanza())
+  } 
+
+  test "Suceso trágico: muerte de ser amado" {
+    anakin.vivirSuceso(-100)
+    assert.that(anakin.esperanza() <= 0)
+    assert.equals("sith", anakin.lado())
+  }
+
+  test "Suceso extremo lado oscuro: lo intentan convencer de asesinar a su familia" {
+    anakin.vivirSuceso(-60) // pasa a sith
+    assert.equals("sith", anakin.lado())
+    
+    anakin.vivirSuceso(200) // suceso extremo
+    assert.equals("jedi", anakin.lado())
+    assert.equals(50, anakin.esperanza())
+  }
+}
+
+describe "Invasion en Tatooine" {
+
+  const anakin = new Maestro(lado="jedi", midiclorianos=200)
+  const obiwan = new Maestro(lado="jedi", midiclorianos=150)
+  const yoda   = new Maestro(lado="jedi", midiclorianos=250)
+  const rey    = new Maestro(lado="jedi", midiclorianos=170)
+
+  const vader     = new Maestro(lado="sith", midiclorianos=30000)
+  const dookuSith = new Maestro(lado="sith", midiclorianos=20000)
+  const kyloRen   = new Maestro(lado="sith", midiclorianos=17000)
+  const palpatine = new Maestro(lado="sith", midiclorianos=23000)
+
+  const tatooine = new Tatooine()
+  const ladoOscuro = new FuerzaOscura()
+
+  method initialize(){
+    ladoOscuro.reclutarTropa(vader)
+    ladoOscuro.reclutarTropa(dookuSith)
+    ladoOscuro.reclutarTropa(kyloRen)
+  }
+
+  test "Anakin consigue un amigo (Obiwan)"{
+    const esperanzaInicial = anakin.esperanza()
+    const carga = obiwan.potencia()
+    conSeguirAmigo.aplicarA(anakin, obiwan)
+
+    assert.equals(esperanzaInicial + carga, anakin.esperanza())
+  }
+
+  test "Batalla con muchas bajas" {
+   tatooine.entraADefender(anakin)
+   const habitantesInicial = tatooine.habitantes()
+   tatooine.esAtacadaPor(ladoOscuro)
+   const habitantesEsperados = habitantesInicial * 0.9
+
+   assert.equals(habitantesEsperados, tatooine.habitantes())
+}
 
 }
